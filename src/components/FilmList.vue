@@ -16,7 +16,6 @@
             <el-menu-item index="3">分类</el-menu-item>
           </el-menu>
 
-          
           <!-- <div style="margin: 5px 20px 0">
       <el-button type="primary" size="small" plain @click="changeStandard(1)">按名称</el-button>
       <el-button type="success" size="small" plain @click="changeStandard(2)">按导演</el-button>
@@ -27,16 +26,29 @@
       </el-header>
 
       <el-container>
-
-        <el-aside width="20%">
-					<div style="margin-top: 20px; margin-left: 15px;">
-						<el-card class="rank-box">
-
-						</el-card>
-					</div>
-				</el-aside>
+        <el-aside width="360px">
+          <div style="margin-top: 20px; margin-left: 15px;">
+            <el-card class="rank-box">
+              <div class="clearfix">
+                <span class="title">排行榜</span>
+              </div>
+              <div>
+                <el-table
+                  :data="allFilms"
+                  style="width: 100%"
+									height="2000"
+                  :default-sort="{prop: 'aveRating', order: 'descending'}"
+                >
+									<el-table-column prop="title" label="名称" width="225"></el-table-column>
+                  <el-table-column prop="aveRating" label="评分" sortable width="75"></el-table-column>
+                  
+                </el-table>
+              </div>
+            </el-card>
+          </div>
+        </el-aside>
         <el-main>
-					<div style="margin-top: 5px; margin-left: 15px;">
+          <div style="margin-top: 5px; margin-left: 15px;">
             <el-input class="search" placeholder="搜索电影" v-model="filterText"></el-input>
             <el-radio-group v-model="defaultStandard" size="medium" @change="changeStandard">
               <el-radio-button label="按名称"></el-radio-button>
@@ -61,16 +73,14 @@
                 <el-main>
                   <div class="text item">
                     <el-rate
-                      v-model="film.rating.average"
+                      v-model="film.aveRating"
                       disabled
                       show-score
                       text-color="#ff9900"
                       score-template="{value}"
                     ></el-rate>
                   </div>
-                  <div
-                    class="text item"
-                  >{{getAllElements(film.genres) + ' （'+ getAllElements(film.countries) + '）'}}</div>
+                  <div class="text item">{{getAllElements(film.genres) + ' （'+ getAllElements(film.countries) + '）'}}</div>
                   <div class="text item">{{'上映时间：' + film.pubdate}}</div>
                   <div class="text item">{{'导演：' + getAllNames(film.directors)}}</div>
                   <div class="text item name">{{'主演：' + getAllNames(film.casts)}}</div>
@@ -190,9 +200,9 @@ export default {
           response.data.split("\n").forEach(element => {
             this.allFilms.push(JSON.parse(element));
             // 电影评分数据类型由String转换没Number，由于评分插件需要
-            this.allFilms[this.allFilms.length - 1].rating.average = Number(
+            this.allFilms[this.allFilms.length - 1].aveRating = Number(
               this.allFilms[this.allFilms.length - 1].rating.average
-            );
+						);
           });
           this.filterFilms = this.allFilms;
           this.currentFilms = this.filterFilms.slice(0, 10);
@@ -307,11 +317,11 @@ export default {
 }
 
 .box-card {
-	text-align: center;
+  text-align: center;
   margin: 15px;
 }
 
 .rank-box {
-	height: 300px;
+  height: 100%;
 }
 </style>
