@@ -1,5 +1,23 @@
 <template>
   <div>
+    <div>
+      <div style="margin-top: 20px">
+				<el-input class="search" placeholder="搜索电影" v-model="filterText"></el-input>
+        <el-radio-group v-model="defaultStandard" size="medium" @change="changeStandard">
+          <el-radio-button label="按名称"></el-radio-button>
+          <el-radio-button label="按导演"></el-radio-button>
+          <el-radio-button label="按演员"></el-radio-button>
+          <el-radio-button label="按剧情"></el-radio-button>
+        </el-radio-group>
+      </div>
+      <!-- <div style="margin: 5px 20px 0">
+      <el-button type="primary" size="small" plain @click="changeStandard(1)">按名称</el-button>
+      <el-button type="success" size="small" plain @click="changeStandard(2)">按导演</el-button>
+      <el-button type="info" size="small" plain @click="changeStandard(3)">按演员</el-button>
+      <el-button type="warning" size="small" plain @click="changeStandard(4)">按剧情</el-button>
+      </div>-->
+    </div>
+
     <div v-for="film in currentFilms" :key="film._id">
       <el-card class="box-card" :body-style="{ padding: '10px' }">
         <div slot="header" class="clearfix">
@@ -23,7 +41,9 @@
                 score-template="{value}"
               ></el-rate>
             </div>
-            <div class="text item">{{'国家：' + getAllElements(film.countries)}}</div>
+            <div
+              class="text item"
+            >{{getAllElements(film.genres) + ' （'+ getAllElements(film.countries) + '）'}}</div>
             <div class="text item">{{'上映时间：' + film.pubdate}}</div>
             <div class="text item">{{'导演：' + getAllNames(film.directors)}}</div>
             <div class="text item name">{{'主演：' + getAllNames(film.casts)}}</div>
@@ -54,7 +74,7 @@
       background
       @current-change="handleCurrentChange"
       layout="total, prev, pager, next"
-      :total="this.allFilms.length"
+      :total="this.filterFilms.length"
       :page-size="10"
       :current-page.sync="currentPage"
       style="margin-top: 10px"
@@ -67,10 +87,69 @@ export default {
   name: "FilmList",
   data() {
     return {
+			defaultStandard: "按名称",
+      selectedStandard: "按名称",
+      filterText: "",
       allFilms: [],
+      filterFilms: [],
       currentFilms: [],
       currentPage: 1
     };
+  },
+  watch: {
+		// 过滤关键字发生变化时，自动过滤一遍
+    filterText(val) {
+			console.log(this.selectedStandard);
+      if (this.selectedStandard == "按名称") {
+        this.filterFilms = this.allFilms.filter(ele => {
+          return ele.title.indexOf(val) != -1;
+        });
+      }
+      if (this.selectedStandard == "按导演") {
+        this.filterFilms = this.allFilms.filter(ele => {
+          return this.getAllNames(ele.directors).indexOf(val) != -1;
+        });
+      }
+      if (this.selectedStandard == "按演员") {
+        this.filterFilms = this.allFilms.filter(ele => {
+          return this.getAllNames(ele.casts).indexOf(val) != -1;
+        });
+      }
+      if (this.selectedStandard == "按剧情") {
+        this.filterFilms = this.allFilms.filter(ele => {
+          return ele.summary.indexOf(val) != -1;
+        });
+      }
+      console.log(this.selectedStandard);
+      this.handleCurrentChange();
+      console.log(this.filterFilms);
+		},
+		// 过滤标准发生变化时，根据原关键字按照新的过滤标准重新过滤一遍
+		selectedStandard(val) {
+			if (val == "按名称") {
+        this.filterFilms = this.allFilms.filter(ele => {
+          return ele.title.indexOf(this.filterText) != -1;
+        });
+      }
+      if (val == "按导演") {
+        this.filterFilms = this.allFilms.filter(ele => {
+          return this.getAllNames(ele.directors).indexOf(this.filterText) != -1;
+        });
+      }
+      if (val == "按演员") {
+        this.filterFilms = this.allFilms.filter(ele => {
+          return this.getAllNames(ele.casts).indexOf(this.filterText) != -1;
+        });
+      }
+      if (val == "按剧情") {
+        this.filterFilms = this.allFilms.filter(ele => {
+          return ele.summary.indexOf(this.filterText) != -1;
+        });
+      }
+      console.log(this.selectedStandard);
+      this.handleCurrentChange();
+      console.log(this.filterFilms);
+		}
   },
   methods: {
     getData: function() {
@@ -84,14 +163,15 @@ export default {
               this.allFilms[this.allFilms.length - 1].rating.average
             );
           });
-          this.currentFilms = this.allFilms.slice(0, 10);
+          this.filterFilms = this.allFilms;
+          this.currentFilms = this.filterFilms.slice(0, 10);
         })
         .catch(err => {
           console.log(err);
         });
     },
     handleCurrentChange() {
-      this.currentFilms = this.allFilms.slice(
+      this.currentFilms = this.filterFilms.slice(
         (this.currentPage - 1) * 10,
         (this.currentPage - 1) * 10 + 10
       );
@@ -115,10 +195,17 @@ export default {
         }
       });
       return all;
-    }
+    },
+		changeStandard(val) {
+			console.log(val);
+			this.selectedStandard = val
+		}
   },
   mounted() {
     this.allFilms = [];
+    this.filterFilms = [];
+    this.currentFilms = [];
+    this.filterText = "";
     this.getData();
     console.log(this.allFilms);
   }
@@ -131,9 +218,14 @@ export default {
   text-align: center;
 }
 
+.search {
+  width: 450px;
+  margin-bottom: 5px;
+}
+
 .image {
-	margin-left: 30px;
-	margin-top: 25px;
+  margin-left: 30px;
+  margin-top: 25px;
   width: 60%;
   display: block;
 }
@@ -167,7 +259,7 @@ export default {
 }
 
 .name {
-	-webkit-line-clamp: 1;
+  -webkit-line-clamp: 1;
 }
 
 .clearfix:before,
