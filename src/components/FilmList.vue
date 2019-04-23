@@ -12,8 +12,8 @@
             text-color="#fff"
             active-text-color="#ffd04b"
           >
-            <el-menu-item index="1">电影列表</el-menu-item>
-            <el-menu-item index="3">分类</el-menu-item>
+            <el-menu-item index="1" style="font-size: 22px">电影列表</el-menu-item>
+            <el-menu-item index="2" style="font-size: 22px">分类</el-menu-item>
           </el-menu>
 
           <!-- <div style="margin: 5px 20px 0">
@@ -48,7 +48,7 @@
           </div>
         </el-aside>
         <el-main>
-          <div style="margin-top: 5px; margin-left: 15px;">
+          <div v-if="activeIndex == 1" style="margin-top: 5px; margin-left: 15px;">
             <el-input class="search" placeholder="搜索电影" v-model="filterText"></el-input>
             <el-radio-group v-model="defaultStandard" size="medium" @change="changeStandard">
               <el-radio-button label="按名称"></el-radio-button>
@@ -57,10 +57,23 @@
               <el-radio-button label="按剧情"></el-radio-button>
             </el-radio-group>
           </div>
+					<div v-if="activeIndex == 2" style="margin-top: 5px; margin-left: 15px;">
+							<el-radio-group v-model="defaultCategory" size="medium" @change="changeCategory">
+								<el-radio-button label="全部"></el-radio-button>
+              <el-radio-button label="喜剧"></el-radio-button>
+              <el-radio-button label="科幻"></el-radio-button>
+              <el-radio-button label="动作"></el-radio-button>
+							<el-radio-button label="犯罪"></el-radio-button>
+              <el-radio-button label="惊悚"></el-radio-button>
+							<el-radio-button label="爱情"></el-radio-button>
+							<el-radio-button label="传记"></el-radio-button>
+							<el-radio-button label="纪录片"></el-radio-button>
+            </el-radio-group>
+					</div>
           <div v-for="film in currentFilms" :key="film._id">
             <el-card class="box-card" :body-style="{ padding: '10px' }">
               <div slot="header" class="clearfix">
-                <span class="title">{{film.title}}</span>
+                <span class="title" @click="viewDetails(film)">{{film.title}}</span>
               </div>
               <el-container>
                 <el-aside width="200px">
@@ -72,20 +85,30 @@
                 </el-aside>
                 <el-main>
                   <div class="text item">
+										<el-row>
+											<div style="width: 130px">
+											<el-col>
+												<div>
                     <el-rate
-                      v-model="film.aveRating"
+											allow-half
+                      v-model="film.stars"
                       disabled
-                      show-score
                       text-color="#ff9900"
                       score-template="{value}"
-                    ></el-rate>
+                    ></el-rate></div>
+										</el-col></div>
+										<el-col :span="6">
+											<div style="color: #ff9900; font-size: 16px">{{film.aveRating}}
+											</div>
+											</el-col>
+										</el-row>
                   </div>
                   <div class="text item">{{getAllElements(film.genres) + ' （'+ getAllElements(film.countries) + '）'}}</div>
                   <div class="text item">{{'上映时间：' + film.pubdate}}</div>
                   <div class="text item">{{'导演：' + getAllNames(film.directors)}}</div>
                   <div class="text item name">{{'主演：' + getAllNames(film.casts)}}</div>
                   <div class="text item">{{'剧情：' + film.summary}}</div>
-                  <el-button style="float: right; padding: 3px 0" type="text">查看详情</el-button>
+                  <el-button style="float: right; padding: 3px 0" type="text" @click="viewDetails(film)">查看详情</el-button>
                 </el-main>
               </el-container>
             </el-card>
@@ -124,12 +147,14 @@
 
 <script>
 export default {
-  name: "FilmList",
+	name: "FilmList",
   data() {
     return {
-      activeIndex: "1",
+			activeIndex: "1",
+			defaultCategory: "全部",
+			selectedCategory: "全部",
       defaultStandard: "按名称",
-      selectedStandard: "按名称",
+			selectedStandard: "按名称",
       filterText: "",
       allFilms: [],
       filterFilms: [],
@@ -194,6 +219,10 @@ export default {
   },
   methods: {
     getData: function() {
+			if(this.$route.params.index != null) {
+				this.activeIndex = this.$route.params.index
+			}
+			
       this.$axios
         .get("../../static/films.json")
         .then(response => {
@@ -203,6 +232,7 @@ export default {
             this.allFilms[this.allFilms.length - 1].aveRating = Number(
               this.allFilms[this.allFilms.length - 1].rating.average
 						);
+						this.allFilms[this.allFilms.length - 1].stars = this.allFilms[this.allFilms.length - 1].aveRating / 2
           });
           this.filterFilms = this.allFilms;
           this.currentFilms = this.filterFilms.slice(0, 10);
@@ -240,10 +270,34 @@ export default {
     changeStandard(val) {
       console.log(val);
       this.selectedStandard = val;
-    },
+		},
+		changeCategory(val) {
+			console.log(val);
+			if(val == "全部") {
+				val = ""
+			}
+			this.selectedCategory = val;
+			this.filterFilms = this.allFilms.filter(ele => {
+        return this.getAllElements(ele.genres).indexOf(val) != -1;
+      });
+			this.handleCurrentChange();
+		},
     handleSelect(key, keyPath) {
-      console.log(key, keyPath);
-    }
+			console.log(key, keyPath);
+			this.activeIndex = Number(keyPath[0])
+			this.filterFilms = this.allFilms
+			this.handleCurrentChange();
+		},
+		viewDetails(f) {
+			this.$router.push(
+				{
+					name: 'detail',
+					params: {
+						film: f
+					}
+				}
+			)
+		}
   },
   created() {},
   mounted() {
@@ -276,6 +330,7 @@ export default {
 }
 
 .title {
+	cursor: pointer;
   color: #0984e3;
   font-weight: 500;
   font-size: 20px;
