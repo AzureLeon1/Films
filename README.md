@@ -8,6 +8,8 @@
 >
 > 姓名：王亮
 
+访问地址：[http://www.leonwang.top/films/](http://www.leonwang.top/films/)
+
 ## 1. 功能
 
 1. 使用 JavaScript 解析 JSON 文件（必选项）
@@ -16,9 +18,39 @@
 4. 电影分类浏览
 5. 电影详情页
 6. 搜索功能（包括按名称、按导演、按演员、按剧情等多种搜索方式）
-7. 数据分析及可视化
+7. 数据统计及可视化
 
-## Build Setup
+## 2. 功能展示
+
+1. 电影列表
+
+    ![电影列表](./gif/列表.gif)
+
+2. 分页功能
+
+    ![](./gif/分页.gif)
+
+3. 电影分类浏览
+
+    ![](./gif/分类.gif)
+
+4. 排行榜
+
+    ![](./gif/排行榜.gif)
+
+5. 搜索功能
+
+    ![](./gif/搜索.gif)
+
+6. 电影详情页
+
+    ![](./gif/电影详情页.gif)
+
+7. 数据统计及可视化
+
+    ![](./gif/数据统计.gif)
+
+## 3. Build Setup
 
 ``` bash
 # install dependencies

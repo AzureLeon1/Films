@@ -8,6 +8,7 @@ Vue.use(Router)
 
 export default new Router({
   mode: 'history',
+  base: '/films/',
   routes: [
     {
       path: '/',
