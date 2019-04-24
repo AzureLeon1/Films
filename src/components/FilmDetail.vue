@@ -12,9 +12,10 @@
             text-color="#fff"
             active-text-color="#ffd04b"
           >
-            <el-menu-item index="1" style="font-size: 22px">电影列表</el-menu-item>
-            <el-menu-item index="2" style="font-size: 22px">分类</el-menu-item>
-            <el-menu-item index="3" style="font-size: 22px">电影详情</el-menu-item>
+            <el-menu-item index="1" style="font-size: 20px">电影列表</el-menu-item>
+            <el-menu-item index="2" style="font-size: 20px">分类</el-menu-item>
+            <el-menu-item index="3" style="font-size: 20px">数据统计</el-menu-item>
+            <el-menu-item index="4" style="font-size: 20px">电影详情</el-menu-item>
           </el-menu>
         </div>
       </el-header>
@@ -163,7 +164,7 @@ export default {
   name: "FilmDetail",
   data() {
     return {
-      activeIndex: "3",
+      activeIndex: "4",
       currentFilm: null,
       averageRating: 2,
       stars5: 0,
@@ -196,6 +197,9 @@ export default {
             index: Number(keyPath[0])
           }
         });
+        if(keyPath[0] == "3") {
+          this.$router.push('/statistics')
+        }
       }
     },
     returnList() {

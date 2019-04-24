@@ -12,8 +12,9 @@
             text-color="#fff"
             active-text-color="#ffd04b"
           >
-            <el-menu-item index="1" style="font-size: 22px">电影列表</el-menu-item>
-            <el-menu-item index="2" style="font-size: 22px">分类</el-menu-item>
+            <el-menu-item index="1" style="font-size: 20px">电影列表</el-menu-item>
+            <el-menu-item index="2" style="font-size: 20px">分类</el-menu-item>
+            <el-menu-item index="3" style="font-size: 20px">数据统计</el-menu-item>
           </el-menu>
 
           <!-- <div style="margin: 5px 20px 0">
@@ -291,8 +292,12 @@ export default {
     },
     handleSelect(key, keyPath) {
       console.log(key, keyPath);
-      this.activeIndex = Number(keyPath[0]);
+      if(keyPath[0]=='3') {
+        this.$router.push('/statistics')
+      }
+      this.activeIndex = keyPath[0];
       this.filterFilms = this.allFilms;
+      this.currentPage = 1;
       this.handleCurrentChange();
     },
     viewDetails(f) {
